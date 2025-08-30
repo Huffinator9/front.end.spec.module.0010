@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Container, Row, Col, Card, Form, Button, Spinner } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import { getProducts, getProductsByCategory } from "../firebase/productsCRUD";
+import { getProducts, /*getProductsByCategory*/ } from "../firebase/productsCRUD";
 
 function ProductList() {
   const [products, setProducts] = useState([]);
