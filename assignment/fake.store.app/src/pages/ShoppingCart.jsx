@@ -3,6 +3,8 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import { removeFromCart, clearCart } from '../store/cartSlice';
+import { auth } from '../firebase';
+import { createOrder } from '../firebase/ordersCRUD';
 
 function ShoppingCart() {
   const items = useSelector((state) => state.cart.items);
@@ -16,10 +18,18 @@ function ShoppingCart() {
     .reduce((sum, item) => sum + item.quantity * item.price, 0)
     .toFixed(2);
 
-  const handleCheckout = () => {
-    alert('Checkout successful! Your cart has been cleared.');
-    dispatch(clearCart());
-    sessionStorage.removeItem('cart');
+  const handleCheckout = async () => {
+      if (!auth.currentUser) return alert("Please log in to place an order.");
+
+      try {
+	  await createOrder(auth.currentUser.uid, items);
+	  dispatch(clearCart());
+	  sessionStorage.removeItem('cart');
+	  alert('Order placed successfully.');
+      } catch (err) {
+	  console.error(err);
+	  alert('Error placing order. Please try again.');
+      }
   };
 
   return (
@@ -62,7 +72,7 @@ function ShoppingCart() {
           <div className="mt-4 text-center">
             <h4>Total Items: {totalItems}</h4>
             <h4>Total Price: ${totalPrice}</h4>
-            <Button variant="success" onClick={handleCheckout}>
+            <Button variant="outline-success" onClick={handleCheckout}>
               Checkout
             </Button>
           </div>

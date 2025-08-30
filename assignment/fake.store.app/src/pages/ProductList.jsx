@@ -1,44 +1,42 @@
-// src/pages/ProductList.jsx
+// src: src/pages/ProductList.jsx
 
-import { useState } from 'react';
-import axios from 'axios';
-import { useQuery } from '@tanstack/react-query';
-import { Container, Row, Col, Card, Spinner, Form, Button } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { addToCart } from '../store/cartSlice';
-
-// Fetch categories
-const fetchCategories = async () => {
-  const res = await axios.get('https://fakestoreapi.com/products/categories');
-  return res.data;
-};
-
-// Fetch products (all or by category)
-const fetchProducts = async (category) => {
-  const url =
-    category && category !== 'all'
-      ? `https://fakestoreapi.com/products/category/${category}`
-      : 'https://fakestoreapi.com/products';
-  const res = await axios.get(url);
-  return res.data;
-};
+import { useEffect, useState } from "react";
+import { Container, Row, Col, Card, Form, Button, Spinner } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import { getProducts, getProductsByCategory } from "../firebase/productsCRUD";
 
 function ProductList() {
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const dispatch = useDispatch();
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [loading, setLoading] = useState(true);
 
-  // Load categories
-  const { data: categories = [], isLoading: loadingCategories } = useQuery({
-    queryKey: ['categories'],
-    queryFn: fetchCategories,
-  });
+  // Fetch products
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      const data = selectedCategory === "all" 
+        ? await getProducts() 
+        : await getProductsByCategory(selectedCategory);
+      setProducts(data);
+      setLoading(false);
+    };
 
-  // Load products based on category
-  const { data: products = [], isLoading: loadingProducts } = useQuery({
-    queryKey: ['products', selectedCategory],
-    queryFn: () => fetchProducts(selectedCategory),
-  });
+    fetchProducts();
+  }, [selectedCategory]);
+
+  // Extract categories dynamically from products
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const data = await getProducts();
+      const uniqueCategories = ["all", ...new Set(data.map(p => p.category))];
+      setCategories(uniqueCategories);
+    };
+
+    fetchCategories();
+  }, []);
+
+  if (loading) return <Spinner animation="border" />;
 
   return (
     <Container className="mt-4">
@@ -51,47 +49,40 @@ function ProductList() {
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
         >
-          <option value="all">All</option>
-          {categories.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat.charAt(0).toUpperCase() + cat.slice(1)}
-            </option>
+          {categories.map(cat => (
+            <option key={cat} value={cat}>{cat}</option>
           ))}
         </Form.Select>
       </Form.Group>
 
       {/* Products */}
-      {loadingProducts || loadingCategories ? (
-        <div className="text-center">
-          <Spinner animation="border" />
-        </div>
-      ) : (
-        <Row>
-          {products.map((product) => (
-            <Col key={product.id} md={4} className="mb-4">
-              <Card>
-                <Card.Img
-                  variant="top"
-                  src={product.image}
-                  style={{ height: '300px', objectFit: 'contain' }}
-                />
-                <Card.Body>
-                  <Card.Title>{product.title}</Card.Title>
-                  <Card.Text>${product.price}</Card.Text>
-
-                  {/* View Details navigates */}
-                  <Link to={`/products/${product.id}`}>
-                    <Button variant="outline-primary" size="sm"> View Details </Button>
-                  </Link>
-
-                  {/* Add to Cart dispatches */}
-                  <Button variant="outline-success" size="sm" className="ms-2" onClick={() => dispatch(addToCart(product))}> Add to Cart </Button>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
-        </Row>
-      )}
+      <Row>
+        {products.map(product => (
+          <Col key={product.id} md={4} className="mb-4">
+            <Card>
+              <Card.Img
+                variant="top"
+                src={product.image}
+                style={{ height: '300px', objectFit: 'contain' }}
+              />
+              <Card.Body>
+                <Card.Title>{product.title}</Card.Title>
+                <Card.Text>${product.price}</Card.Text>
+                <Link to={`/edit-product/${product.id}`}>
+                  <Button variant="outline-primary" size="sm" className="m-1">
+                    Edit
+                  </Button>
+                </Link>
+                <Link to={`/products/${product.id}`}>
+                  <Button variant="outline-success" size="sm" className="m-1">
+                    View
+                  </Button>
+                </Link>
+              </Card.Body>
+            </Card>
+          </Col>
+        ))}
+      </Row>
     </Container>
   );
 }
