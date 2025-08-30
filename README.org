@@ -1,1 +1,6 @@
 * Front End Specialization Module 0010
+** Assignment
+   - Firebase in E-Commerce App
+
+** Project
+   - CI/CD Pipeline for E-Commerce App

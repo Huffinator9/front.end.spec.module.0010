@@ -1,0 +1,28 @@
+// src: src/App.jsx
+
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import ProductDetail from './pages/ProductDetail';
+import AddProduct from './pages/AddProduct';
+import EditProduct from './pages/EditProduct';
+import Layout from './components/Layout';
+import ShoppingCart from './pages/ShoppingCart';
+
+function App() {
+    return (
+	<Router>
+	    <Layout>
+		<Routes>
+		    <Route path="/" element={<Home />} />
+{/*		    <Route path="/products" element={<ProductList />} />*/}
+   		    <Route path="/cart" element={<ShoppingCart />} />
+		    <Route path="/products/:id" element={<ProductDetail />} />
+		    <Route path="/products/:id/edit" element={<EditProduct />} />
+		    <Route path="/add-product" element={<AddProduct />} />
+		</Routes>
+	    </Layout>
+	</Router>
+    );
+}
+
+export default App;
