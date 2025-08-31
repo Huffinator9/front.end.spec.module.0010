@@ -19,27 +19,23 @@ jobs:
       # setup node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
-	with:
-	   node-version: 20
-
-      # navigate to app folder
-      - name: navigate to app folder
-        run: cd project/fake.store.app
+        with:
+          node-version: 20
 
       # install dependencies
       - name: Install dependencies
         run: npm install
-	working-directory: project/fake.store.app
+        working-directory: project/fake.store.app
 
       # build project
       - name: build project
         run: npm run build
-	working-directory: project/fake.store.app
+        working-directory: project/fake.store.app
 
       # deploy to GitHub Pages
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v6
-	with:
-	   github_token: ${{ secrets.GITHUB_TOKEN }}
-	   publish_branch: gh-pages
-	   publish_dir: project/fake.store.app/dist
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: project/fake.store.app/dist
