@@ -38,4 +38,3 @@
    - Fetch the list of user carts from the backend API endpoint.
    - Display each cart entry with details such as the cart ID, date of creation, and the total price of the order.
    - Enable users to click on individual orders to view the full details, including the list of products and the total price of the order.
-
