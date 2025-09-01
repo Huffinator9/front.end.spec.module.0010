@@ -1,7 +1,8 @@
 {
   "name": "fake.store.app",
-  "private": true,
   "version": "0.0.0",
+  "private": true,
+  "homepage": "https://Huffinator9.github.io/front.end.spec.module.0010",
   "type": "module",
   "scripts": {
     "dev": "vite",
