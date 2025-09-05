@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import { removeFromCart, clearCart } from '../store/cartSlice';
 import { auth } from '../firebase';
-import { createOrder } from '../firebase/ordersCRUD';
+//import { createOrder } from '../firebase/ordersCRUD';
 
 function ShoppingCart() {
   const items = useSelector((state) => state.cart.items);

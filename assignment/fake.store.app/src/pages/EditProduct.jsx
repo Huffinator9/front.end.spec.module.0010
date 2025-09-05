@@ -5,7 +5,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Container, Form, Button } from "react-bootstrap";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
-import { updateProduct, deleteProduct } from "../firebase/productsCRUD";
+// import { updateProduct, deleteProduct } from "../firebase/productsCRUD";
 
 function EditProduct() {
   const { id } = useParams();
