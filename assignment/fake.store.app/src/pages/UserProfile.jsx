@@ -1,0 +1,115 @@
+// src/pages/UserProfile.jsx
+
+import { useState, useEffect } from "react";
+import { auth, db } from "../firebase/firebase";
+import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
+
+function UserProfile() {
+  const [userData, setUserData] = useState({ name: "", address: "", email: "" });
+  const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (!auth.currentUser) return;
+      try {
+        const userRef = doc(db, "users", auth.currentUser.uid);
+        const docSnap = await getDoc(userRef);
+        if (docSnap.exists()) {
+          setUserData(docSnap.data());
+        } else {
+          console.log("No user document found!");
+        }
+      } catch (err) {
+        console.error("Error fetching user:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  const handleChange = (e) => {
+    setUserData({ ...userData, [e.target.name]: e.target.value });
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    setUpdating(true);
+    try {
+      const userRef = doc(db, "users", auth.currentUser.uid);
+      await updateDoc(userRef, {
+        name: userData.name,
+        address: userData.address,
+      });
+      alert("Profile updated successfully!");
+    } catch (err) {
+      console.error("Error updating profile:", err);
+      alert("Failed to update profile.");
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!window.confirm("Are you sure you want to delete your account? This cannot be undone!")) return;
+    try {
+      const uid = auth.currentUser.uid;
+      await deleteDoc(doc(db, "users", uid));
+      await auth.currentUser.delete();
+      alert("Account deleted successfully!");
+      navigate("/"); 
+    } catch (err) {
+      console.error("Error deleting account:", err);
+      alert("Failed to delete account. You may need to re-login and try again.");
+    }
+  };
+
+  if (loading) return <p>Loading profile...</p>;
+
+  return (
+    <div className="container mt-5">
+      <h2>User Profile</h2>
+      <form onSubmit={handleUpdate}>
+        <div className="mb-3">
+          <label>Email (cannot change)</label>
+          <input type="email" className="form-control" value={userData.email} disabled />
+        </div>
+        <div className="mb-3">
+          <label>Name</label>
+          <input
+            type="text"
+            className="form-control"
+            name="name"
+            value={userData.name || ""}
+            onChange={handleChange}
+          />
+        </div>
+        <div className="mb-3">
+          <label>Address</label>
+          <input
+            type="text"
+            className="form-control"
+            name="address"
+            value={userData.address || ""}
+            onChange={handleChange}
+          />
+        </div>
+        <button type="submit" className="btn btn-primary" disabled={updating}>
+          {updating ? "Updating..." : "Update Profile"}
+        </button>
+      </form>
+
+      <hr />
+
+      <button className="btn btn-danger mt-3" onClick={handleDelete}>
+        Delete Account
+      </button>
+    </div>
+  );
+}
+
+export default UserProfile;

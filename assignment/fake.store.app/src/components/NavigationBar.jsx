@@ -1,6 +1,6 @@
 // src/components/NavigationBar.jsx
 
-import { auth } from "../firebase";
+import { auth } from "../firebase/firebase";
 import { Link } from 'react-router-dom';
 import { Navbar, Nav, Container } from 'react-bootstrap';
 import { signOut } from "firebase/auth";
