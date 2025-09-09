@@ -1,7 +1,7 @@
 // src/pages/Register.jsx
 
 import { useState } from "react";
-import { auth, db } from "../firebase/firebase";
+import { auth, db } from "../firebase/firebaset";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 
